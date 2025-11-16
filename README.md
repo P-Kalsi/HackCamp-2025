@@ -1,4 +1,4 @@
-# Eye Tracking Heatmap Project
+# SiteSee
 
 A web application that tracks user eye gaze while browsing websites and generates heatmaps of where users look.
 
