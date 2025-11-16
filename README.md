@@ -80,8 +80,12 @@ The client will run on `http://localhost:5173` (or another port if 5173 is taken
 
 # Citations
 
-This project makes use of the WebGazer library, which provides its data collection methodology
+This project makes use of the **WebGazer library**, which provides its data collection methodology
 
 Papoutsaki, A., Sangkloy, P., Laskey, J., Daskalova, N., Huang, J., & Hays, J.
 WebGazer: Scalable Webcam Eye Tracking Using User Interactions.
 Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI), 2016.
+
+The project also uses **Heatmap.js** for the visualization of data.
+Heatmap.js © Patrick Wied.
+GitHub: https://github.com/pa7/heatmap.js
