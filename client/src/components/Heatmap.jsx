@@ -33,13 +33,18 @@ function Heatmap({ gazeData, isVisible, onInstanceReady, isTrackingActive = true
           minOpacity: 0,
           blur: 0.85,
           gradient: {
-            '.1': 'blue',
-            '.3': 'cyan',
-            '.5': 'lime',
-            '.65': 'yellow',
-            '.8': 'orange',
-            '.9': 'red',
-            '.95': 'darkred'
+            '0': '#0000FF',
+            '.2': '#0080FF',
+            '.35': '#00FFFF',
+            '.45': '#00FF80',
+            '.55': '#80FF00',
+            '.65': '#FFFF00',
+            '.75': '#FFCC00',
+            '.82': '#FF9900',
+            '.88': '#FF6600',
+            '.93': '#FF3300',
+            '.97': '#FF0000',
+            '1': '#CC0000'
           }
         });
 
