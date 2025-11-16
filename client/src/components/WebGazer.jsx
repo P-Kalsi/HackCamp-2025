@@ -9,7 +9,8 @@ const SHOW_LASER = true;
 function WebGazer() {
   const [isCalibrated, setIsCalibrated] = useState(false);
   const [gazePosition, setGazePosition] = useState(null);
-  const [showLaser, setShowLaser] = useState(SHOW_LASER);
+  const [showLaser, setShowLaser] = useState(false); // Start with laser off
+  const [isTrackingActive, setIsTrackingActive] = useState(false); // Track if tracking is active
   const webgazerRef = useRef(null);
   const gazeDataRef = useRef([]); // Store gaze data for heatmap
   const [panelPosition, setPanelPosition] = useState({ x: null, y: null }); // null = use default CSS positioning
@@ -46,7 +47,13 @@ function WebGazer() {
     webgazer.setGazeListener((data, time) => {
       if (data && data.x !== null && data.y !== null) {
         // Always update gaze position (needed for WebsiteViewer tracking)
-        setGazePosition({ x: data.x, y: data.y });
+        // Only update if tracking is active
+        if (isTrackingActive) {
+          setGazePosition({ x: data.x, y: data.y });
+        } else {
+          // Clear gaze position when tracking is inactive
+          setGazePosition(null);
+        }
         
         // Store gaze data for heatmap (even if laser is off)
         // This will be processed by WebsiteViewer component
@@ -59,7 +66,13 @@ function WebGazer() {
         webgazer.clearGazeListener();
       }
     };
-  }, [isCalibrated, showLaser]);
+  }, [isCalibrated, isTrackingActive]);
+
+  // Handle tracking state changes from WebsiteViewer
+  const handleTrackingStateChange = (isActive) => {
+    setIsTrackingActive(isActive);
+    setShowLaser(isActive && SHOW_LASER); // Turn laser on/off based on tracking state
+  };
 
   const handleCalibrationComplete = () => {
     setIsCalibrated(true);
@@ -145,8 +158,9 @@ function WebGazer() {
     <div className="webgazer-container">
       <WebsiteViewer
         gazePosition={gazePosition}
-        showLaser={showLaser}
+        showLaser={showLaser && isTrackingActive}
         onGazeData={handleGazeData}
+        onTrackingStateChange={handleTrackingStateChange}
       />
       
       {/* Control panel overlay - draggable */}

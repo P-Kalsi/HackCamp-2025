@@ -1,0 +1,45 @@
+.heatmap-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  background-color: #1a1a1a;
+}
+
+.heatmap-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: transparent !important;
+}
+
+.heatmap-container canvas {
+  background: transparent !important;
+}
+
+.exit-heatmap-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: rgba(255, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 10001;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.exit-heatmap-button:hover {
+  background-color: rgba(255, 34, 34, 1);
+}
+

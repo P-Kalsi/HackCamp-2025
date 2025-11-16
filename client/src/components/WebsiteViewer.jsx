@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './WebsiteViewer.css';
+import Heatmap from './Heatmap';
 
-function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
+function WebsiteViewer({ gazePosition, showLaser, onGazeData, onTrackingStateChange }) {
   const [url, setUrl] = useState('');
   const [currentUrl, setCurrentUrl] = useState('');
   const [iframeError, setIframeError] = useState(false);
@@ -11,8 +12,11 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
   const [currentProxyIndex, setCurrentProxyIndex] = useState(0);
   const [isWebsiteLoaded, setIsWebsiteLoaded] = useState(false);
   const [isTrackingStopped, setIsTrackingStopped] = useState(false);
+  const [showHeatmapView, setShowHeatmapView] = useState(false);
+  const [latestGazeData, setLatestGazeData] = useState(null);
   const iframeRef = useRef(null);
   const gazeDataRef = useRef([]);
+  const heatmapInstanceRef = useRef(null);
 
   // Public CORS proxy services (no server setup required!)
   // These proxies fetch and return the HTML content
@@ -43,9 +47,10 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
     },
   ];
 
-  // Track gaze data continuously for heatmap
+  // Track gaze data continuously for heatmap - ONLY when tracking is active
   useEffect(() => {
-    if (!gazePosition || !currentUrl) return;
+    // Only track when: website is loaded, tracking is not stopped, and we have gaze data
+    if (!gazePosition || !currentUrl || !isWebsiteLoaded || isTrackingStopped) return;
 
     // Get iframe position and dimensions
     const iframe = iframeRef.current;
@@ -77,6 +82,9 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
 
       gazeDataRef.current.push(gazeDataPoint);
       
+      // Update latest gaze data for heatmap component
+      setLatestGazeData(gazeDataPoint);
+      
       // Notify parent component of new gaze data (for heatmap)
       if (onGazeData) {
         onGazeData(gazeDataPoint);
@@ -87,7 +95,7 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
         gazeDataRef.current = gazeDataRef.current.slice(-10000);
       }
     }
-  }, [gazePosition, currentUrl, onGazeData]);
+  }, [gazePosition, currentUrl, onGazeData, isWebsiteLoaded, isTrackingStopped]);
 
   const handleUrlSubmit = async (e) => {
     e.preventDefault();
@@ -104,6 +112,10 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
     setProxyError(null);
     setIsWebsiteLoaded(false); // Reset when loading new URL
     setIsTrackingStopped(false); // Reset tracking state
+    // Stop tracking when loading new URL
+    if (onTrackingStateChange) {
+      onTrackingStateChange(false);
+    }
     
     // Determine final URL based on proxy settings
     let finalUrl = formattedUrl;
@@ -123,6 +135,8 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
     
     // Clear previous gaze data when loading new URL
     gazeDataRef.current = [];
+    setLatestGazeData(null);
+    setShowHeatmapView(false);
   };
 
   const handleIframeLoad = () => {
@@ -130,14 +144,77 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
     setIframeError(false);
     setIsWebsiteLoaded(true); // Mark website as loaded
     setIsTrackingStopped(false); // Reset tracking state when new page loads
+    // Start tracking when website loads
+    if (onTrackingStateChange) {
+      onTrackingStateChange(true);
+    }
   };
 
   const handleStopTracking = () => {
     setIsTrackingStopped(true);
+    // Stop tracking and laser
+    if (onTrackingStateChange) {
+      onTrackingStateChange(false);
+    }
   };
 
   const handleResumeTracking = () => {
     setIsTrackingStopped(false);
+    setShowHeatmapView(false); // Hide heatmap view when resuming
+    // Resume tracking and laser
+    if (onTrackingStateChange) {
+      onTrackingStateChange(true);
+    }
+  };
+
+  const handleViewHeatmap = () => {
+    setShowHeatmapView(true);
+  };
+
+  const handleExitHeatmap = () => {
+    setShowHeatmapView(false);
+  };
+
+  const handleSavePNG = () => {
+    if (!heatmapInstanceRef.current) {
+      console.error('Heatmap instance not available');
+      alert('Heatmap not ready. Please wait a moment and try again.');
+      return;
+    }
+
+    try {
+      // Force a repaint to ensure the heatmap is up to date
+      heatmapInstanceRef.current.repaint();
+      
+      // Small delay to ensure repaint completes
+      setTimeout(() => {
+        const dataURL = heatmapInstanceRef.current.getDataURL();
+        
+        if (!dataURL) {
+          console.error('No data URL returned from heatmap');
+          alert('No heatmap data available to download.');
+          return;
+        }
+
+        // Create download link
+        const link = document.createElement('a');
+        link.download = `heatmap-${Date.now()}.png`;
+        link.href = dataURL;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        setTimeout(() => {
+          document.body.removeChild(link);
+        }, 100);
+        
+        console.log('Heatmap download triggered');
+      }, 200);
+    } catch (error) {
+      console.error('Error downloading heatmap:', error);
+      alert('Error downloading heatmap: ' + error.message);
+    }
   };
 
   const handleIframeError = () => {
@@ -191,7 +268,31 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
   }, [currentUrl]);
 
   return (
-    <div className="website-viewer-container">
+    <>
+      {/* Heatmap instance - always mounted to preserve data, visibility controlled by isVisible prop */}
+      {isWebsiteLoaded && (
+        <Heatmap
+          gazeData={latestGazeData}
+          isVisible={showHeatmapView}
+          isTrackingActive={!isTrackingStopped}
+          onInstanceReady={(instance) => {
+            heatmapInstanceRef.current = instance;
+          }}
+        />
+      )}
+      
+      {/* Exit button - shown when viewing heatmap */}
+      {showHeatmapView && (
+        <button 
+          className="exit-heatmap-button"
+          onClick={handleExitHeatmap}
+        >
+          Exit heatmap
+        </button>
+      )}
+      
+      {/* Hide website container when viewing heatmap */}
+      <div className="website-viewer-container" style={{ visibility: showHeatmapView ? 'hidden' : 'visible' }}>
       <div className="website-viewer-header">
         <form onSubmit={handleUrlSubmit} className="url-form">
           <input
@@ -276,6 +377,7 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
               sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-downloads allow-modals"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             />
+            
           </>
         ) : (
           <div className="placeholder-message">
@@ -301,27 +403,22 @@ function WebsiteViewer({ gazePosition, showLaser, onGazeData }) {
             <button 
               type="button"
               className="view-heatmap-button"
-              onClick={() => {
-                // TODO: Implement view heatmap functionality
-                console.log('View heatmap clicked');
-              }}
+              onClick={handleViewHeatmap}
             >
               View heatmap
             </button>
             <button 
               type="button"
               className="save-png-button"
-              onClick={() => {
-                // TODO: Implement save PNG functionality
-                console.log('Save PNG clicked');
-              }}
+              onClick={handleSavePNG}
             >
               Save png
             </button>
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
