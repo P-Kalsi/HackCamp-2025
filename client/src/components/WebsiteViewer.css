@@ -1,0 +1,264 @@
+.website-viewer-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1a1a1a;
+  color: white;
+  overflow: hidden;
+}
+
+.website-viewer-header {
+  padding: 1rem;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #444;
+  z-index: 100;
+}
+
+.url-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.proxy-checkbox-container {
+  display: flex;
+  align-items: center;
+}
+
+.proxy-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.proxy-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.url-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background-color: #1a1a1a;
+  color: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.url-input:focus {
+  border-color: #646cff;
+}
+
+.url-input::placeholder {
+  color: #888;
+}
+
+.load-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.load-button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.load-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 6px;
+  color: #ff6b6b;
+}
+
+.error-message p {
+  margin: 0.5rem 0;
+}
+
+.error-suggestion {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.iframe-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.website-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: white;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(26, 26, 26, 0.8);
+  z-index: 10;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.placeholder-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 2rem;
+  color: #aaa;
+}
+
+.placeholder-message h2 {
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.laser-pointer-overlay {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background-color: #00ff00;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10000;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.4);
+  transition: left 0.1s linear, top 0.1s linear;
+}
+
+.stop-tracking-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.stop-tracking-button:hover:not(:disabled) {
+  background-color: #ff2222;
+}
+
+.stop-tracking-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #666;
+}
+
+.resume-tracking-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.resume-tracking-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.resume-tracking-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #666;
+}
+
+.bottom-right-buttons {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 10002;
+}
+
+.view-heatmap-button,
+.save-png-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.view-heatmap-button {
+  background-color: #646cff;
+}
+
+.view-heatmap-button:hover {
+  background-color: #535bf2;
+}
+
+.save-png-button {
+  background-color: #4CAF50;
+}
+
+.save-png-button:hover {
+  background-color: #45a049;
+}
+
+.heatmap-fullscreen-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  pointer-events: none; /* Allow clicks to pass through except for button */
+}
+
+.heatmap-fullscreen-view .exit-heatmap-button {
+  pointer-events: auto; /* Button should be clickable */
+}
+
